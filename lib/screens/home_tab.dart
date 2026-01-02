@@ -123,19 +123,6 @@ class HomeTab extends StatelessWidget {
 
                             Row(
                               children: [
-                                Container(
-                                  height: 80,
-                                  width: 80,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                    image: const DecorationImage(
-                                      image: NetworkImage('https://i.pravatar.cc/300?img=11'),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
                                 const Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
