@@ -1,8 +1,31 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
+import '../widgets/shimmer_loading.dart';
 
-class ConfessScreen extends StatelessWidget {
+class ConfessScreen extends StatefulWidget {
   const ConfessScreen({super.key});
+
+  @override
+  State<ConfessScreen> createState() => _ConfessScreenState();
+}
+
+class _ConfessScreenState extends State<ConfessScreen> {
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,20 +35,20 @@ class ConfessScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.textMain),
+          icon: const Icon(Icons.arrow_back, color: AppColors.textMain),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Confess Room', style: TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold)),
+        title: const Text('Confess Room', style: TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold)),
         centerTitle: true,
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 16),
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.white24,
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.shield, color: AppColors.textMain, size: 16),
+            child: const Icon(Icons.shield, color: AppColors.textMain, size: 16),
           ),
         ],
       ),
@@ -41,7 +64,7 @@ class ConfessScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Speak your mind\nfreely.',
                 style: TextStyle(
                   color: AppColors.textMain,
@@ -56,7 +79,7 @@ class ConfessScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF33691E).withOpacity(0.2), // Dark green background
+                  color: const Color(0xFF33691E).withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: const Color(0xFF33691E).withOpacity(0.5)),
                 ),
@@ -89,40 +112,52 @@ class ConfessScreen extends StatelessWidget {
               const SizedBox(height: 24),
 
               // Feed
-              _buildConfessionItem(
-                avatarColor: Colors.teal,
-                name: 'Anonymous Owl',
-                time: '2m ago',
-                text: 'I honestly don\'t know how I\'m going to pass Stats 101... Is anyone else struggling this much? The professor moves way too fast.',
-                likes: 12,
-                comments: 4,
-                mood: 'Hug',
-              ),
-              _buildConfessionItem(
-                avatarImage: 'https://i.pravatar.cc/150?img=60',
-                name: 'Hidden Fox',
-                time: '15m ago',
-                text: 'To the girl in the red hoodie at the library: your playlist is too loud, but honestly? impeccable taste. Can you drop the link?',
-                likes: 48,
-                comments: 12,
-                isHighlight: true,
-              ),
-               _buildConfessionItem(
-                 avatarColor: Colors.purple,
-                name: 'Silent Echo',
-                time: '1h ago',
-                text: 'Found a wallet near the cafeteria. Turned it into security. Hope you get it back, Jason!',
-                likes: 85,
-                comments: 2,
-              ),
-              _buildConfessionItem(
-                avatarColor: Colors.grey,
-                name: 'Ghost Writer',
-                time: '3h ago',
-                text: 'Sometimes I just sit in the quad and watch the squirrels. It\'s the only peace I get during finals week.',
-                likes: 23,
-                comments: 0,
-              ),
+              if (_isLoading)
+                Column(
+                  children: List.generate(3, (index) => const Padding(
+                    padding: EdgeInsets.only(bottom: 16),
+                    child: ShimmerLoading.rectangular(height: 150),
+                  )),
+                )
+              else
+                Column(
+                  children: [
+                    _buildConfessionItem(
+                      avatarColor: Colors.teal,
+                      name: 'Anonymous Owl',
+                      time: '2m ago',
+                      text: 'I honestly don\'t know how I\'m going to pass Stats 101... Is anyone else struggling this much? The professor moves way too fast.',
+                      likes: 12,
+                      comments: 4,
+                      mood: 'Hug',
+                    ),
+                    _buildConfessionItem(
+                      avatarImage: 'https://i.pravatar.cc/150?img=60',
+                      name: 'Hidden Fox',
+                      time: '15m ago',
+                      text: 'To the girl in the red hoodie at the library: your playlist is too loud, but honestly? impeccable taste. Can you drop the link?',
+                      likes: 48,
+                      comments: 12,
+                      isHighlight: true,
+                    ),
+                     _buildConfessionItem(
+                       avatarColor: Colors.purple,
+                      name: 'Silent Echo',
+                      time: '1h ago',
+                      text: 'Found a wallet near the cafeteria. Turned it into security. Hope you get it back, Jason!',
+                      likes: 85,
+                      comments: 2,
+                    ),
+                    _buildConfessionItem(
+                      avatarColor: Colors.grey,
+                      name: 'Ghost Writer',
+                      time: '3h ago',
+                      text: 'Sometimes I just sit in the quad and watch the squirrels. It\'s the only peace I get during finals week.',
+                      likes: 23,
+                      comments: 0,
+                    ),
+                  ],
+                ),
               
               const SizedBox(height: 60),
 
@@ -198,34 +233,34 @@ class ConfessScreen extends StatelessWidget {
                   Text(name, style: TextStyle(color: isHighlight ? AppColors.primaryGold : AppColors.primaryTeal, fontWeight: FontWeight.bold)),
                 ],
               ),
-              Text(time, style: TextStyle(color: AppColors.textGray, fontSize: 12)),
+              Text(time, style: const TextStyle(color: AppColors.textGray, fontSize: 12)),
             ],
           ),
           const SizedBox(height: 12),
           Text(
             text,
-            style: TextStyle(color: AppColors.textMain, fontSize: 15, height: 1.5),
+            style: const TextStyle(color: AppColors.textMain, fontSize: 15, height: 1.5),
           ),
           const SizedBox(height: 16),
           Row(
             children: [
               Icon(Icons.favorite, color: likes > 50 ? AppColors.statusRed : AppColors.textGray, size: 18),
               const SizedBox(width: 6),
-              Text('$likes', style: TextStyle(color: AppColors.textGray, fontSize: 13)),
+              Text('$likes', style: const TextStyle(color: AppColors.textGray, fontSize: 13)),
               const SizedBox(width: 16),
               Icon(Icons.chat_bubble, color: AppColors.textGray, size: 18),
               const SizedBox(width: 6),
-              Text('$comments', style: TextStyle(color: AppColors.textGray, fontSize: 13)),
+              Text('$comments', style: const TextStyle(color: AppColors.textGray, fontSize: 13)),
               
               if (mood != null) ...[
                 const SizedBox(width: 16),
-                Icon(Icons.sentiment_satisfied, color: AppColors.textGray, size: 18),
+                const Icon(Icons.sentiment_satisfied, color: AppColors.textGray, size: 18),
                 const SizedBox(width: 6),
-                Text(mood, style: TextStyle(color: AppColors.textGray, fontSize: 13)),
+                Text(mood, style: const TextStyle(color: AppColors.textGray, fontSize: 13)),
               ],
 
               const Spacer(),
-              Icon(Icons.flag, color: AppColors.textGray, size: 18),
+              const Icon(Icons.flag, color: AppColors.textGray, size: 18),
             ],
           ),
         ],

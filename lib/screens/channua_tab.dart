@@ -1,8 +1,31 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
+import '../widgets/shimmer_loading.dart';
 
-class ChannuaTab extends StatelessWidget {
+class ChannuaTab extends StatefulWidget {
   const ChannuaTab({super.key});
+
+  @override
+  State<ChannuaTab> createState() => _ChannuaTabState();
+}
+
+class _ChannuaTabState extends State<ChannuaTab> {
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +46,7 @@ class ChannuaTab extends StatelessWidget {
                           children: [
                              const CircleAvatar(backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=12'), radius: 20), // User
                              const SizedBox(width: 12),
-                             Text(
+                             const Text(
                               'Channua Room',
                               style: TextStyle(color: AppColors.textMain, fontSize: 20, fontWeight: FontWeight.bold),
                             ),
@@ -31,10 +54,10 @@ class ChannuaTab extends StatelessWidget {
                         ),
                         Row(
                           children: [
-                            IconButton(icon: const Icon(Icons.search, color: AppColors.textGray, size: 20), onPressed: null),
+                            const IconButton(icon: Icon(Icons.search, color: AppColors.textGray, size: 20), onPressed: null),
                             Stack(
                               children: [
-                                Icon(Icons.notifications, color: AppColors.textMain, size: 20),
+                                const Icon(Icons.notifications, color: AppColors.textMain, size: 20),
                                 Positioned(right: 0, top: 0, child: CircleAvatar(radius: 4, backgroundColor: AppColors.statusRed)),
                               ],
                             ),
@@ -58,49 +81,52 @@ class ChannuaTab extends StatelessWidget {
                     const SizedBox(height: 24),
                     
                     // Ask Question Input
-                    Container(
-                       padding: const EdgeInsets.all(12),
-                       decoration: BoxDecoration(
-                         color: AppColors.backgroundCard,
-                         borderRadius: BorderRadius.circular(16),
-                       ),
-                       child: Column(
-                         children: [
-                           Row(
-                             children: [
-                               const CircleAvatar(
-                                 radius: 16,
-                                 backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=12'), // Current user
-                               ),
-                               const SizedBox(width: 12),
-                               Expanded(
-                                 child: Text(
-                                   "What's on your mind? Ask a question...",
-                                   style: TextStyle(color: AppColors.textGray.withOpacity(0.7)),
+                    if (_isLoading)
+                      const ShimmerLoading.rectangular(height: 100)
+                    else
+                      Container(
+                         padding: const EdgeInsets.all(12),
+                         decoration: BoxDecoration(
+                           color: AppColors.backgroundCard,
+                           borderRadius: BorderRadius.circular(16),
+                         ),
+                         child: Column(
+                           children: [
+                             const Row(
+                               children: [
+                                 CircleAvatar(
+                                   radius: 16,
+                                   backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=12'), // Current user
                                  ),
-                               ),
-                             ],
-                           ),
-                           const SizedBox(height: 12),
-                           Row(
-                             children: [
-                               Icon(Icons.image, color: AppColors.primaryTeal.withOpacity(0.8), size: 20),
-                               const SizedBox(width: 16),
-                               Icon(Icons.sell, color: AppColors.primaryTeal.withOpacity(0.8), size: 20),
-                               const Spacer(),
-                               Container(
-                                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                                 decoration: BoxDecoration(
-                                   color: AppColors.primaryGold,
-                                   borderRadius: BorderRadius.circular(20),
+                                 SizedBox(width: 12),
+                                 Expanded(
+                                   child: Text(
+                                     "What's on your mind? Ask a question...",
+                                     style: TextStyle(color: AppColors.textGray),
+                                   ),
                                  ),
-                                 child: const Text('Post', style: TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.bold)),
-                               ),
-                             ],
-                           )
-                         ],
-                       ),
-                    ),
+                               ],
+                             ),
+                             const SizedBox(height: 12),
+                             Row(
+                               children: [
+                                 Icon(Icons.image, color: AppColors.primaryTeal.withOpacity(0.8), size: 20),
+                                 const SizedBox(width: 16),
+                                 Icon(Icons.sell, color: AppColors.primaryTeal.withOpacity(0.8), size: 20),
+                                 const Spacer(),
+                                 Container(
+                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                   decoration: BoxDecoration(
+                                     color: AppColors.primaryGold,
+                                     borderRadius: BorderRadius.circular(20),
+                                   ),
+                                   child: const Text('Post', style: TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.bold)),
+                                 ),
+                               ],
+                             )
+                           ],
+                         ),
+                      ),
                   ],
                 ),
               ),
@@ -110,41 +136,53 @@ class ChannuaTab extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Discussions', style: TextStyle(color: AppColors.textMain, fontSize: 18, fontWeight: FontWeight.bold)),
+                    const Text('Discussions', style: TextStyle(color: AppColors.textMain, fontSize: 18, fontWeight: FontWeight.bold)),
                     Text('VIEW ALL', style: TextStyle(color: AppColors.primaryTeal.withOpacity(0.8), fontSize: 12, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
               const SizedBox(height: 12),
 
-              ListView(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                children: [
-                  _buildDiscussionItem(
-                    tag: 'Finance',
-                    time: '2h ago',
-                    title: 'HELB Loan Disbursement',
-                    content: 'Has anyone received their HELB loan disbursement for this semester? It\'s been over a week since the portal status changed to...',
-                    likes: 124,
-                    comments: 24,
-                    avatars: ['https://i.pravatar.cc/150?img=1', 'https://i.pravatar.cc/150?img=2', 'https://i.pravatar.cc/150?img=3'],
+              if (_isLoading)
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemCount: 2,
+                  itemBuilder: (context, index) => const Padding(
+                    padding: EdgeInsets.only(bottom: 16),
+                    child: ShimmerLoading.rectangular(height: 200),
                   ),
-                   _buildDiscussionItem(
-                    tag: 'Academics',
-                    time: '45m ago',
-                    title: 'Study Group for SC 301?',
-                    content: 'Looking for serious study partners for Introduction to Computer Science. We meet at the library every Tue/Thu.',
-                    likes: 8,
-                    comments: 5,
-                    author: 'David Kimani',
-                    authorRole: 'Engineering',
-                    hasAuthor: true,
-                    tags: ['#Academics', '#StudyGroup'],
-                  ),
-                ],
-              ),
+                )
+              else
+                ListView(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  children: [
+                    _buildDiscussionItem(
+                      tag: 'Finance',
+                      time: '2h ago',
+                      title: 'HELB Loan Disbursement',
+                      content: 'Has anyone received their HELB loan disbursement for this semester? It\'s been over a week since the portal status changed to...',
+                      likes: 124,
+                      comments: 24,
+                      avatars: ['https://i.pravatar.cc/150?img=1', 'https://i.pravatar.cc/150?img=2', 'https://i.pravatar.cc/150?img=3'],
+                    ),
+                     _buildDiscussionItem(
+                      tag: 'Academics',
+                      time: '45m ago',
+                      title: 'Study Group for SC 301?',
+                      content: 'Looking for serious study partners for Introduction to Computer Science. We meet at the library every Tue/Thu.',
+                      likes: 8,
+                      comments: 5,
+                      author: 'David Kimani',
+                      authorRole: 'Engineering',
+                      hasAuthor: true,
+                      tags: ['#Academics', '#StudyGroup'],
+                    ),
+                  ],
+                ),
               const SizedBox(height: 20),
             ],
           ),
@@ -204,8 +242,8 @@ class ChannuaTab extends StatelessWidget {
                Column(
                  crossAxisAlignment: CrossAxisAlignment.start,
                  children: [
-                   Text(author!, style: TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold)),
-                   Text('$authorRole • $time', style: TextStyle(color: AppColors.textGray, fontSize: 12)),
+                   Text(author!, style: const TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold)),
+                   Text('$authorRole • $time', style: const TextStyle(color: AppColors.textGray, fontSize: 12)),
                  ],
                ),
              ],
@@ -218,16 +256,16 @@ class ChannuaTab extends StatelessWidget {
                   children: [
                     Text(tag, style: const TextStyle(color: AppColors.primaryTeal, fontWeight: FontWeight.bold, fontSize: 12)),
                     const SizedBox(width: 8),
-                    Text('• $time', style: TextStyle(color: AppColors.textGray, fontSize: 12)),
+                    Text('• $time', style: const TextStyle(color: AppColors.textGray, fontSize: 12)),
                   ],
                 ),
-                Icon(Icons.more_horiz, color: AppColors.textGray),
+                const Icon(Icons.more_horiz, color: AppColors.textGray),
               ],
             ),
           
-          if (!hasAuthor) const SizedBox(height: 12) else const SizedBox(height: 12),
+          const SizedBox(height: 12),
           
-          Text(title, style: TextStyle(color: AppColors.textMain, fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(title, style: const TextStyle(color: AppColors.textMain, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Text(content, style: TextStyle(color: AppColors.textGray.withOpacity(0.9), height: 1.4)),
           
@@ -244,18 +282,18 @@ class ChannuaTab extends StatelessWidget {
           ],
 
           const SizedBox(height: 16),
-          Divider(height: 1, color: AppColors.white24),
+          const Divider(height: 1, color: AppColors.white24),
           const SizedBox(height: 12),
           
           Row(
             children: [
               Icon(Icons.thumb_up_alt_outlined, color: AppColors.textGray.withOpacity(0.7), size: 18),
               const SizedBox(width: 6),
-              Text('$likes', style: TextStyle(color: AppColors.textMain, fontSize: 13, fontWeight: FontWeight.bold)),
+              Text('$likes', style: const TextStyle(color: AppColors.textMain, fontSize: 13, fontWeight: FontWeight.bold)),
               const SizedBox(width: 20),
               Icon(Icons.chat_bubble_outline, color: AppColors.textGray.withOpacity(0.7), size: 18),
                const SizedBox(width: 6),
-              Text('$comments Replies', style: TextStyle(color: AppColors.textMain, fontSize: 13, fontWeight: FontWeight.bold)),
+              Text('$comments Replies', style: const TextStyle(color: AppColors.textMain, fontSize: 13, fontWeight: FontWeight.bold)),
               
               const Spacer(),
               

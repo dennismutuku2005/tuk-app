@@ -1,10 +1,98 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
-import '../widgets/bug_report_overlay.dart';
+import '../widgets/shimmer_loading.dart';
 import 'login_screen.dart';
 
-class SettingsTab extends StatelessWidget {
+class SettingsTab extends StatefulWidget {
   const SettingsTab({super.key});
+
+  @override
+  State<SettingsTab> createState() => _SettingsTabState();
+}
+
+class _SettingsTabState extends State<SettingsTab> {
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _showBugReportDialog() {
+    final TextEditingController controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.backgroundCard,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Text(
+          'Report a Bug',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Please describe the issue you encountered.',
+              style: TextStyle(color: Colors.grey, fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: 'What went wrong?',
+                hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+                filled: true,
+                fillColor: Colors.black.withOpacity(0.2),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.all(16),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Bug report submitted!'),
+                  backgroundColor: AppColors.primaryTeal,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryGold,
+              foregroundColor: AppColors.primaryDark,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('Submit', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +109,10 @@ class SettingsTab extends StatelessWidget {
                 Row(
                   children: [
                     IconButton(
-                        icon: Icon(Icons.arrow_back, color: AppColors.textMain),
-                        onPressed: () {},
+                        icon: const Icon(Icons.arrow_back, color: AppColors.textMain),
+                        onPressed: () => Navigator.maybePop(context),
                       ),
-                    Expanded(
+                    const Expanded(
                       child: Text(
                         'Settings',
                         textAlign: TextAlign.start,
@@ -41,56 +129,18 @@ class SettingsTab extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 // Profile Section
-                 Center(
-                  child: Stack(
+                if (_isLoading)
+                  const Column(
                     children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                        ),
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage: NetworkImage('https://i.pravatar.cc/300?img=11'),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryGold,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(Icons.edit, color: AppColors.primaryDark, size: 16),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Center(
-                  child: Column(
-                    children: [
-                      Text(
-                        'Alex Johnson',
-                        style: TextStyle(
-                          color: AppColors.textMain,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      ShimmerLoading.circular(radius: 50),
+                      SizedBox(height: 16),
+                      ShimmerLoading.rectangular(height: 24, width: 150),
                       SizedBox(height: 8),
-                      Text(
-                        'Computer Science • ID: 20234819',
-                        style: TextStyle(
-                          color: AppColors.primaryTeal,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      ShimmerLoading.rectangular(height: 16, width: 200),
                     ],
-                  ),
-                ),
+                  )
+                else
+                  _buildProfileSection(),
 
                 const SizedBox(height: 32),
 
@@ -104,9 +154,9 @@ class SettingsTab extends StatelessWidget {
                   child: Column(
                     children: [
                       _buildSettingsItem(Icons.person, 'Personal Information'),
-                      Divider(height: 1, color: AppColors.white24),
+                      const Divider(height: 1, color: AppColors.white24),
                       _buildSettingsItem(Icons.lock, 'Security & Password'),
-                       Divider(height: 1, color: AppColors.white24),
+                       const Divider(height: 1, color: AppColors.white24),
                       _buildSettingsItem(Icons.badge, 'Digital Student ID'),
                     ],
                   ),
@@ -142,17 +192,15 @@ class SettingsTab extends StatelessWidget {
                   child: Column(
                     children: [
                        _buildSettingsItem(Icons.info_outline, 'About App'),
-                      Divider(height: 1, color: AppColors.white24),
+                      const Divider(height: 1, color: AppColors.white24),
                       _buildSettingsItem(
                         Icons.bug_report_outlined, 
                         'Report Bug',
-                        onTap: () {
-                           BugReportOverlay.of(context)?.activate();
-                        },
+                        onTap: _showBugReportDialog,
                       ),
-                      Divider(height: 1, color: AppColors.white24),
+                      const Divider(height: 1, color: AppColors.white24),
                       _buildSettingsItem(Icons.help_outline, 'Help Center'),
-                      Divider(height: 1, color: AppColors.white24),
+                      const Divider(height: 1, color: AppColors.white24),
                       _buildSettingsItem(Icons.privacy_tip_outlined, 'Privacy Policy'),
                     ],
                   ),
@@ -181,7 +229,7 @@ class SettingsTab extends StatelessWidget {
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                         Icon(Icons.logout, color: AppColors.primaryTeal), // Design shows teal for logout icon? Or uses Teal accent colour globally? Let's use Teal to match image
+                         Icon(Icons.logout, color: AppColors.primaryTeal),
                          SizedBox(width: 8),
                          Text(
                           'Sign Out',
@@ -207,6 +255,52 @@ class SettingsTab extends StatelessWidget {
     );
   }
 
+  Widget _buildProfileSection() {
+    return Column(
+      children: [
+        Center(
+          child: Stack(
+            children: [
+              const CircleAvatar(
+                radius: 50,
+                backgroundImage: NetworkImage('https://i.pravatar.cc/300?img=11'),
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: AppColors.primaryGold,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.edit, color: AppColors.primaryDark, size: 16),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Alex Johnson',
+          style: TextStyle(
+            color: AppColors.textMain,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Computer Science • ID: 20234819',
+          style: TextStyle(
+            color: AppColors.primaryTeal,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildSettingsItem(IconData icon, String title, {String? trailing, VoidCallback? onTap}) {
     return ListTile(
       leading: Container(
@@ -217,15 +311,15 @@ class SettingsTab extends StatelessWidget {
         ),
         child: Icon(icon, color: AppColors.primaryGold, size: 20),
       ),
-      title: Text(title, style: TextStyle(color: AppColors.textMain, fontSize: 16, fontWeight: FontWeight.w500)),
+      title: Text(title, style: const TextStyle(color: AppColors.textMain, fontSize: 16, fontWeight: FontWeight.w500)),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (trailing != null) ...[
-            Text(trailing, style: TextStyle(color: AppColors.textGray, fontSize: 14)),
+            Text(trailing, style: const TextStyle(color: AppColors.textGray, fontSize: 14)),
             const SizedBox(width: 8),
           ],
-          Icon(Icons.chevron_right, color: AppColors.textGray),
+          const Icon(Icons.chevron_right, color: AppColors.textGray),
         ],
       ),
       onTap: onTap ?? () {},
@@ -237,12 +331,12 @@ class SettingsTab extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: AppColors.primaryTeal.withOpacity(0.1), // Example variations
+          color: AppColors.primaryTeal.withOpacity(0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon, color: AppColors.primaryTeal, size: 20),
       ),
-      title: Text(title, style: TextStyle(color: AppColors.textMain, fontSize: 16, fontWeight: FontWeight.w500)),
+      title: Text(title, style: const TextStyle(color: AppColors.textMain, fontSize: 16, fontWeight: FontWeight.w500)),
       trailing: Switch(
         value: value, 
         onChanged: onChanged,

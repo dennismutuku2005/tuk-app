@@ -1,8 +1,31 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
+import '../widgets/shimmer_loading.dart';
 
-class GradesScreen extends StatelessWidget {
+class GradesScreen extends StatefulWidget {
   const GradesScreen({super.key});
+
+  @override
+  State<GradesScreen> createState() => _GradesScreenState();
+}
+
+class _GradesScreenState extends State<GradesScreen> {
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,10 +35,10 @@ class GradesScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.textMain),
+          icon: const Icon(Icons.arrow_back, color: AppColors.textMain),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
+        title: const Text(
           'Academic Results',
           style: TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold),
         ),
@@ -25,9 +48,11 @@ class GradesScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildGPAHeader(),
+            _isLoading 
+                ? const ShimmerLoading.rectangular(height: 160)
+                : _buildGPAHeader(),
             const SizedBox(height: 32),
-            Text(
+            const Text(
               'REPORTS BY SEMESTER',
               style: TextStyle(
                 color: AppColors.textGray,
@@ -37,17 +62,29 @@ class GradesScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            _buildSemesterCard('Year 3 - Semester 1 (Current)', '3.82', [
-              _buildGradeItem('SC 301: Introduction to CS', 'A'),
-              _buildGradeItem('SC 302: Data Structures', 'A-'),
-              _buildGradeItem('SC 303: Operating Systems', 'B+'),
-            ]),
-            const SizedBox(height: 16),
-            _buildSemesterCard('Year 2 - Semester 2', '3.65', [
-              _buildGradeItem('SC 201: Discrete Math', 'A'),
-              _buildGradeItem('SC 202: Algorithms', 'B'),
-              _buildGradeItem('SC 203: Databases', 'A-'),
-            ]),
+            if (_isLoading)
+              Column(
+                children: List.generate(2, (index) => Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: const ShimmerLoading.rectangular(height: 200),
+                )),
+              )
+            else
+              Column(
+                children: [
+                   _buildSemesterCard('Year 3 - Semester 1 (Current)', '3.82', [
+                    _buildGradeItem('SC 301: Introduction to CS', 'A'),
+                    _buildGradeItem('SC 302: Data Structures', 'A-'),
+                    _buildGradeItem('SC 303: Operating Systems', 'B+'),
+                  ]),
+                  const SizedBox(height: 16),
+                  _buildSemesterCard('Year 2 - Semester 2', '3.65', [
+                    _buildGradeItem('SC 201: Discrete Math', 'A'),
+                    _buildGradeItem('SC 202: Algorithms', 'B'),
+                    _buildGradeItem('SC 203: Databases', 'A-'),
+                  ]),
+                ],
+              ),
           ],
         ),
       ),
@@ -81,7 +118,7 @@ class GradesScreen extends StatelessWidget {
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(
+                child: const Text(
                   'BSc. Comp Sci',
                   style: TextStyle(color: AppColors.primaryDark, fontSize: 12),
                 ),
@@ -89,7 +126,7 @@ class GradesScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          Text(
+          const Text(
             '3.74',
             style: TextStyle(
               color: AppColors.primaryDark,
@@ -125,7 +162,7 @@ class GradesScreen extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: AppColors.textMain,
                     fontWeight: FontWeight.bold,
                   ),
@@ -151,7 +188,7 @@ class GradesScreen extends StatelessWidget {
     return ListTile(
       title: Text(
         subject,
-        style: TextStyle(color: AppColors.textMain, fontSize: 14),
+        style: const TextStyle(color: AppColors.textMain, fontSize: 14),
       ),
       trailing: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
